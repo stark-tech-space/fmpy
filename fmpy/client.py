@@ -2,6 +2,8 @@ import os
 import requests
 from typing import Dict, Any, Optional, Union, List
 from urllib.parse import urljoin
+import io
+import pandas as pd
 
 from .exceptions import FMPError, FMPRequestError, FMPAPIError
 from .config import BASE_URL
@@ -84,7 +86,8 @@ class FMPClient:
         params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        expect_csv: bool = False,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], pd.DataFrame]:
         """
         Make a request to the FMP API.
 
@@ -94,9 +97,10 @@ class FMPClient:
             params: Query parameters
             data: Request body for POST/PUT requests
             headers: Request headers
+            expect_csv: If True, expect a CSV response instead of JSON
 
         Returns:
-            The response data as a dictionary or list
+            The response data as a dictionary, list, or pandas DataFrame (for CSV)
 
         Raises:
             FMPRequestError: If the request fails
@@ -111,17 +115,44 @@ class FMPClient:
             )
             response.raise_for_status()
 
-            # Check if the response is valid JSON
-            try:
-                response_data = response.json()
-            except ValueError:
-                raise FMPAPIError(f"Invalid JSON response: {response.text}")
+            if expect_csv:
+                # Handle CSV response
+                try:
+                    return pd.read_csv(io.StringIO(response.text))
+                except Exception as e:
+                    raise FMPAPIError(f"Failed to parse CSV response: {str(e)}")
+            else:
+                # Handle JSON response
+                try:
+                    response_data = response.json()
+                except ValueError:
+                    # Try to handle it as CSV if JSON parsing fails - but only if autodiscovery is active
+                    if (
+                        len(response.text) > 0
+                        and response.text[0] in ['"', ","]
+                        and "," in response.text
+                    ):
+                        try:
+                            import io
+                            import pandas as pd
 
-            # FMP API sometimes returns an empty list or dictionary for no results
-            if not response_data and not isinstance(response_data, (list, dict)):
-                return []
+                            return pd.read_csv(io.StringIO(response.text))
+                        except Exception:
+                            # If both JSON and CSV parsing fail, raise the original JSON error
+                            raise FMPAPIError(
+                                f"Invalid JSON response: {response.text[:500]}..."
+                            )
+                    else:
+                        # Not likely a CSV, raise the original JSON error
+                        raise FMPAPIError(
+                            f"Invalid JSON response: {response.text[:500]}..."
+                        )
 
-            return response_data
+                # FMP API sometimes returns an empty list or dictionary for no results
+                if not response_data and not isinstance(response_data, (list, dict)):
+                    return []
+
+                return response_data
 
         except requests.exceptions.RequestException as e:
             raise FMPRequestError(f"Request failed: {str(e)}")
@@ -133,26 +164,31 @@ class FMPClient:
             raise FMPRequestError(f"Unexpected error: {str(e)}")
 
     def get(
-        self, endpoint: str, params: Optional[Dict[str, Any]] = None
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, Any]] = None,
+        expect_csv: bool = False,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], pd.DataFrame]:
         """
         Make a GET request to the FMP API.
 
         Args:
             endpoint: API endpoint path
             params: Query parameters
+            expect_csv: If True, expect a CSV response instead of JSON
 
         Returns:
             The response data
         """
-        return self._request("GET", endpoint, params=params)
+        return self._request("GET", endpoint, params=params, expect_csv=expect_csv)
 
     def post(
         self,
         endpoint: str,
         data: Dict[str, Any],
         params: Optional[Dict[str, Any]] = None,
-    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        expect_csv: bool = False,
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]], pd.DataFrame]:
         """
         Make a POST request to the FMP API.
 
@@ -160,11 +196,14 @@ class FMPClient:
             endpoint: API endpoint path
             data: Request body
             params: Query parameters
+            expect_csv: If True, expect a CSV response instead of JSON
 
         Returns:
             The response data
         """
-        return self._request("POST", endpoint, params=params, data=data)
+        return self._request(
+            "POST", endpoint, params=params, data=data, expect_csv=expect_csv
+        )
 
     @property
     def search(self) -> SearchEndpoints:

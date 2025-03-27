@@ -69,7 +69,8 @@ class TestFMPClient(unittest.TestCase):
         mock_response = MagicMock()
         mock_response.raise_for_status.return_value = None
         mock_response.json.side_effect = ValueError("Invalid JSON")
-        mock_response.text = "Not JSON"
+        # Make sure the text doesn't look like a CSV (no commas)
+        mock_response.text = "This is Not JSON and not CSV either"
         mock_request.return_value = mock_response
 
         with self.assertRaises(FMPAPIError):

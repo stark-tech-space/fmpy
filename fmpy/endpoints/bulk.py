@@ -239,11 +239,16 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
-        response = self._client.get("income-statement-bulk", params=params)
+        # Always expect CSV for this endpoint
+        response = self._client.get(
+            "income-statement-bulk", params=params, expect_csv=True
+        )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
 
     def income_statement_growth(
         self, year: int, period: str, as_dataframe: bool = True
@@ -261,11 +266,16 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
-        response = self._client.get("income-statement-growth-bulk", params=params)
+        # Always expect CSV for this endpoint
+        response = self._client.get(
+            "income-statement-growth-bulk", params=params, expect_csv=True
+        )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
 
     def balance_sheet_statement(
         self, year: int, period: str, as_dataframe: bool = True
@@ -283,11 +293,16 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
-        response = self._client.get("balance-sheet-statement-bulk", params=params)
+        # Always expect CSV for this endpoint
+        response = self._client.get(
+            "balance-sheet-statement-bulk", params=params, expect_csv=True
+        )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
 
     def balance_sheet_statement_growth(
         self, year: int, period: str, as_dataframe: bool = True
@@ -305,13 +320,16 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
+        # Always expect CSV for this endpoint
         response = self._client.get(
-            "balance-sheet-statement-growth-bulk", params=params
+            "balance-sheet-statement-growth-bulk", params=params, expect_csv=True
         )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
 
     def cash_flow_statement(
         self, year: int, period: str, as_dataframe: bool = True
@@ -329,11 +347,16 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
-        response = self._client.get("cash-flow-statement-bulk", params=params)
+        # Always expect CSV for this endpoint
+        response = self._client.get(
+            "cash-flow-statement-bulk", params=params, expect_csv=True
+        )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
 
     def cash_flow_statement_growth(
         self, year: int, period: str, as_dataframe: bool = True
@@ -351,8 +374,13 @@ class BulkEndpoints:
         """
         params = {"year": year, "period": period}
 
-        response = self._client.get("cash-flow-statement-growth-bulk", params=params)
+        # Always expect CSV for this endpoint
+        response = self._client.get(
+            "cash-flow-statement-growth-bulk", params=params, expect_csv=True
+        )
 
+        # Response is already a DataFrame from the CSV parser
         if as_dataframe:
-            return response_to_df(response)
-        return response
+            return response
+        # Convert DataFrame to list of dictionaries if as_dataframe is False
+        return response.to_dict("records")
