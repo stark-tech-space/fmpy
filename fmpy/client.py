@@ -2,7 +2,6 @@ import os
 import requests
 from typing import Dict, Any, Optional, Union, List
 from urllib.parse import urljoin
-import io
 import pandas as pd
 
 from .exceptions import FMPError, FMPRequestError, FMPAPIError
@@ -118,6 +117,9 @@ class FMPClient:
             if expect_csv:
                 # Handle CSV response
                 try:
+                    import io
+                    import pandas as pd
+
                     return pd.read_csv(io.StringIO(response.text))
                 except Exception as e:
                     raise FMPAPIError(f"Failed to parse CSV response: {str(e)}")
