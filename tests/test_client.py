@@ -91,6 +91,7 @@ class TestFMPClient(unittest.TestCase):
         self.assertIsNotNone(self.client.forex)
         self.assertIsNotNone(self.client.sec)
         self.assertIsNotNone(self.client.bulk)
+        self.assertIsNotNone(self.client.directory)
 
 
 if __name__ == "__main__":

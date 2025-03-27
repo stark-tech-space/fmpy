@@ -299,6 +299,30 @@ key_metrics = client.bulk.key_metrics_ttm()
 print(key_metrics)
 ```
 
+### Directory and Symbol Listings
+
+```python
+import fmpy
+
+client = fmpy.Client(api_key="your_api_key")
+
+# Get list of all available company symbols
+symbols = client.directory.company_symbols()
+print(symbols)
+
+# Get list of available exchanges
+exchanges = client.directory.available_exchanges()
+print(exchanges)
+
+# Get list of available sectors
+sectors = client.directory.available_sectors()
+print(sectors)
+
+# Get list of actively trading companies
+active_companies = client.directory.actively_trading_list()
+print(active_companies)
+```
+
 ## DataFrame Support
 
 By default, all responses are returned as pandas DataFrames for easy data analysis. If you prefer to get the raw JSON response, set `as_dataframe=False` in any method call:

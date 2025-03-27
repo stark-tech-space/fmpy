@@ -17,6 +17,7 @@ from .crypto import CryptoEndpoints
 from .forex import ForexEndpoints
 from .sec import SECEndpoints
 from .bulk import BulkEndpoints
+from .directory import DirectoryEndpoints
 
 __all__ = [
     "SearchEndpoints",
@@ -32,4 +33,5 @@ __all__ = [
     "ForexEndpoints",
     "SECEndpoints",
     "BulkEndpoints",
+    "DirectoryEndpoints",
 ]

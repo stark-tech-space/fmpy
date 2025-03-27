@@ -3,7 +3,6 @@ import requests
 from typing import Dict, Any, Optional, Union, List
 from urllib.parse import urljoin
 import pandas as pd
-
 from .exceptions import FMPError, FMPRequestError, FMPAPIError
 from .config import BASE_URL
 from .endpoints import (
@@ -20,6 +19,7 @@ from .endpoints import (
     ForexEndpoints,
     SECEndpoints,
     BulkEndpoints,
+    DirectoryEndpoints,
 )
 
 
@@ -336,3 +336,13 @@ class FMPClient:
             The bulk data endpoints
         """
         return BulkEndpoints(self)
+
+    @property
+    def directory(self) -> DirectoryEndpoints:
+        """
+        Get the directory endpoints for listings and symbols information.
+
+        Returns:
+            The directory endpoints
+        """
+        return DirectoryEndpoints(self)
