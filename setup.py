@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="fmpy",
-    version="0.1.0",
+    version="0.1.1",
     author="Jimmy",
     author_email="skylinezum@users.noreply.github.com",
     description="Python SDK for Financial Modeling Prep API",
